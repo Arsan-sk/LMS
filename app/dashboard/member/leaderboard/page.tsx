@@ -19,14 +19,20 @@ export default function LeaderboardPage() {
     const { data: session } = useSession()
     const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [filter, setFilter] = useState<"ALL" | "MY_DOMAIN">("ALL")
 
     useEffect(() => {
         fetchLeaderboard()
-    }, [])
+    }, [filter, session?.user?.domainId])
 
     async function fetchLeaderboard() {
+        setIsLoading(true)
         try {
-            const res = await fetch("/api/leaderboard")
+            let url = "/api/leaderboard"
+            if (filter === "MY_DOMAIN" && session?.user?.domainId) {
+                url += `?domainId=${session.user.domainId}`
+            }
+            const res = await fetch(url)
             const data = await res.json()
             setLeaderboard(data)
         } catch (error) {
@@ -47,18 +53,46 @@ export default function LeaderboardPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight text-gray-900">Leaderboard</h1>
-                <p className="text-gray-500">See who's leading the pack in Elite Club.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">Leaderboard</h1>
+                    <p className="text-gray-500">See who's leading the pack in Elite Club.</p>
+                </div>
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                    <button
+                        onClick={() => setFilter("ALL")}
+                        className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${filter === "ALL"
+                                ? "bg-white text-primary-600 shadow-sm"
+                                : "text-gray-500 hover:text-gray-700"
+                            }`}
+                    >
+                        All Members
+                    </button>
+                    <button
+                        onClick={() => setFilter("MY_DOMAIN")}
+                        disabled={!session?.user?.domainId}
+                        className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${filter === "MY_DOMAIN"
+                                ? "bg-white text-primary-600 shadow-sm"
+                                : "text-gray-500 hover:text-gray-700"
+                            } ${!session?.user?.domainId ? "opacity-50 cursor-not-allowed" : ""}`}
+                        title={!session?.user?.domainId ? "You are not assigned to a domain" : "Show ranking in your domain"}
+                    >
+                        My Domain
+                    </button>
+                </div>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Top Performers</CardTitle>
+                    <CardTitle>
+                        {filter === "ALL" ? "Global Rankings" : "Domain Rankings"}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
-                        <p>Loading leaderboard...</p>
+                        <div className="flex justify-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                        </div>
                     ) : leaderboard.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">
                             No data available yet.

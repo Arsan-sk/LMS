@@ -126,12 +126,7 @@ export default function LeadSubmissionsPage() {
                                             </p>
                                         </div>
 
-                                        {submission.answerText && (
-                                            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700 mt-2">
-                                                <p className="font-medium text-xs text-gray-500 mb-1">Answer Text:</p>
-                                                {submission.answerText}
-                                            </div>
-                                        )}
+
 
                                         {submission.files && (
                                             <div className="flex flex-wrap gap-2 mt-2">

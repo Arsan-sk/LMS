@@ -8,6 +8,7 @@ import { PlusCircle, Search, ExternalLink, FileText, Video, Link as LinkIcon, Tr
 import { useSession } from "next-auth/react"
 import { clsx } from "clsx"
 import Link from "next/link"
+import { VideoModal } from "@/components/video-modal"
 
 interface Resource {
     id: string
@@ -41,6 +42,7 @@ export default function LeadResourcesPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [search, setSearch] = useState("")
     const [activeTab, setActiveTab] = useState("ALL")
+    const [selectedVideo, setSelectedVideo] = useState<Resource | null>(null)
 
     useEffect(() => {
         fetchData()
@@ -201,6 +203,16 @@ export default function LeadResourcesPage() {
                                         >
                                             <ExternalLink className="h-4 w-4" />
                                         </a>
+                                        {resource.type === "VIDEO" && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                onClick={() => setSelectedVideo(resource)}
+                                            >
+                                                <Video className="h-4 w-4" />
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -216,6 +228,15 @@ export default function LeadResourcesPage() {
                     ))
                 )}
             </div>
+
+            {selectedVideo && (
+                <VideoModal
+                    isOpen={!!selectedVideo}
+                    onClose={() => setSelectedVideo(null)}
+                    videoUrl={selectedVideo.url}
+                    title={selectedVideo.title}
+                />
+            )}
         </div>
     )
 }

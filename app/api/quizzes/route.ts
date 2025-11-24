@@ -121,10 +121,18 @@ export async function GET(req: Request) {
                     questions: true
                 }
             })
+
+            // Enforce domain check for members
+            if (quiz && session.user.role === "MEMBER" && session.user.domainId && quiz.domainId !== session.user.domainId) {
+                return NextResponse.json({ message: "Unauthorized" }, { status: 403 })
+            }
+
             return NextResponse.json(quiz)
         }
 
-        if (domainId) {
+        if (session.user.role === "MEMBER" && session.user.domainId) {
+            where.domainId = session.user.domainId
+        } else if (domainId) {
             where.domainId = domainId
         }
 
