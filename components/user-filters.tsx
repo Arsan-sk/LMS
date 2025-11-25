@@ -21,28 +21,28 @@ export function UserFilters() {
     return (
         <div className="flex space-x-2">
             <Button
-                variant={currentFilter === "ALL" ? "default" : "outline"}
+                variant={currentFilter === "ALL" ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setFilter("ALL")}
             >
                 All
             </Button>
             <Button
-                variant={currentFilter === "MEMBER" ? "default" : "outline"}
+                variant={currentFilter === "MEMBER" ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setFilter("MEMBER")}
             >
                 Members
             </Button>
             <Button
-                variant={currentFilter === "LEAD" ? "default" : "outline"}
+                variant={currentFilter === "LEAD" ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setFilter("LEAD")}
             >
                 Leads
             </Button>
             <Button
-                variant={currentFilter === "ADMIN" ? "default" : "outline"}
+                variant={currentFilter === "ADMIN" ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setFilter("ADMIN")}
             >

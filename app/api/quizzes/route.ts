@@ -102,6 +102,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
     try {
+        const session = await getServerSession(authOptions)
         const { searchParams } = new URL(req.url)
         const domainId = searchParams.get("domainId")
         const id = searchParams.get("id")
@@ -123,14 +124,14 @@ export async function GET(req: Request) {
             })
 
             // Enforce domain check for members
-            if (quiz && session.user.role === "MEMBER" && session.user.domainId && quiz.domainId !== session.user.domainId) {
+            if (quiz && session?.user?.role === "MEMBER" && session?.user?.domainId && quiz.domainId !== session.user.domainId) {
                 return NextResponse.json({ message: "Unauthorized" }, { status: 403 })
             }
 
             return NextResponse.json(quiz)
         }
 
-        if (session.user.role === "MEMBER" && session.user.domainId) {
+        if (session?.user?.role === "MEMBER" && session?.user?.domainId) {
             where.domainId = session.user.domainId
         } else if (domainId) {
             where.domainId = domainId
