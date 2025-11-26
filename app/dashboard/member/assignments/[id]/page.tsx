@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { ArrowLeft, Upload, FileText, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
+import { uploadFile } from "@/lib/upload"
 
 interface Assignment {
     id: string
@@ -77,12 +78,7 @@ export default function AssignmentDetailPage() {
         try {
             let fileUrl = null
             if (file) {
-                const formData = new FormData()
-                formData.append("file", file)
-                const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
-                if (!uploadRes.ok) throw new Error("Upload failed")
-                const uploadData = await uploadRes.json()
-                fileUrl = uploadData.url
+                fileUrl = await uploadFile(file)
             }
 
             const res = await fetch("/api/submissions", {

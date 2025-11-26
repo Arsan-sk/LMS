@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Upload, ArrowLeft } from "lucide-react"
-import { clsx } from "clsx"
+import { ArrowLeft, Upload, Link as LinkIcon, Video, FileText, Image as ImageIcon } from "lucide-react"
 import Link from "next/link"
+import { clsx } from "clsx"
+import { uploadFile } from "@/lib/upload"
 
 interface Domain {
     id: string
@@ -74,18 +76,7 @@ export default function CreateResourcePage() {
             let finalType = type
 
             if (uploadMode === "FILE" && file) {
-                const formData = new FormData()
-                formData.append("file", file)
-
-                const uploadRes = await fetch("/api/upload", {
-                    method: "POST",
-                    body: formData,
-                })
-
-                if (!uploadRes.ok) throw new Error("File upload failed")
-
-                const uploadData = await uploadRes.json()
-                finalUrl = uploadData.url
+                finalUrl = await uploadFile(file)
             }
 
             const res = await fetch("/api/resources", {
