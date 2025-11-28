@@ -4,11 +4,12 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { PlusCircle, Search, ExternalLink, FileText, Video, Link as LinkIcon, Trash2, Image as ImageIcon, File } from "lucide-react"
+import { PlusCircle, Search, ExternalLink, FileText, Video, Link as LinkIcon, Trash2, Image as ImageIcon, File, Eye, Download } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { clsx } from "clsx"
 import Link from "next/link"
 import { VideoModal } from "@/components/video-modal"
+import { FilePreviewModal } from "@/components/file-preview-modal"
 
 interface Resource {
     id: string
@@ -43,6 +44,7 @@ export default function LeadResourcesPage() {
     const [search, setSearch] = useState("")
     const [activeTab, setActiveTab] = useState("ALL")
     const [selectedVideo, setSelectedVideo] = useState<Resource | null>(null)
+    const [selectedFile, setSelectedFile] = useState<Resource | null>(null)
 
     useEffect(() => {
         fetchData()
@@ -195,33 +197,53 @@ export default function LeadResourcesPage() {
                                         {resource.type}
                                     </span>
                                     <div className="flex space-x-2">
-                                        {/* Show arrow button only for non-video resources */}
-                                        {resource.type !== "VIDEO" && (
+                                        {/* Preview button for viewable files */}
+                                        {(resource.type === "VIDEO" || resource.type === "PDF" || resource.type === "IMAGE" || resource.type === "DOC" || resource.type === "DOCUMENT") && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                onClick={() => {
+                                                    if (resource.type === "VIDEO") {
+                                                        setSelectedVideo(resource)
+                                                    } else {
+                                                        setSelectedFile(resource)
+                                                    }
+                                                }}
+                                                title="Preview"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                        {/* Download button for files */}
+                                        {(resource.type === "PDF" || resource.type === "IMAGE" || resource.type === "DOC" || resource.type === "DOCUMENT") && (
+                                            <a
+                                                href={resource.url}
+                                                download
+                                                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                                                title="Download"
+                                            >
+                                                <Download className="h-4 w-4" />
+                                            </a>
+                                        )}
+                                        {/* External link button for links only */}
+                                        {(resource.type === "LINK" || resource.type === "DRIVE_LINK" || resource.type === "EXTERNAL_LINK") && (
                                             <a
                                                 href={resource.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                                                title="Open link"
                                             >
                                                 <ExternalLink className="h-4 w-4" />
                                             </a>
-                                        )}
-                                        {/* Show camera button for all video resources */}
-                                        {resource.type === "VIDEO" && (
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                onClick={() => setSelectedVideo(resource)}
-                                            >
-                                                <Video className="h-4 w-4" />
-                                            </Button>
                                         )}
                                         <Button
                                             variant="ghost"
                                             size="sm"
                                             className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                             onClick={() => handleDeleteResource(resource.id)}
+                                            title="Delete"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -239,6 +261,16 @@ export default function LeadResourcesPage() {
                     onClose={() => setSelectedVideo(null)}
                     videoUrl={selectedVideo.url}
                     title={selectedVideo.title}
+                />
+            )}
+
+            {selectedFile && (
+                <FilePreviewModal
+                    isOpen={!!selectedFile}
+                    onClose={() => setSelectedFile(null)}
+                    fileUrl={selectedFile.url}
+                    title={selectedFile.title}
+                    fileType={selectedFile.type as "PDF" | "IMAGE" | "DOC" | "DOCUMENT"}
                 />
             )}
         </div>
