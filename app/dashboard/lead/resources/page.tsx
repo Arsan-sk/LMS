@@ -195,14 +195,18 @@ export default function LeadResourcesPage() {
                                         {resource.type}
                                     </span>
                                     <div className="flex space-x-2">
-                                        <a
-                                            href={resource.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8"
-                                        >
-                                            <ExternalLink className="h-4 w-4" />
-                                        </a>
+                                        {/* Show arrow button only for non-video resources */}
+                                        {resource.type !== "VIDEO" && (
+                                            <a
+                                                href={resource.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                                            >
+                                                <ExternalLink className="h-4 w-4" />
+                                            </a>
+                                        )}
+                                        {/* Show camera button for all video resources */}
                                         {resource.type === "VIDEO" && (
                                             <Button
                                                 variant="ghost"
