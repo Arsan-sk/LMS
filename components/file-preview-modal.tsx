@@ -1,8 +1,9 @@
 "use client"
 
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { X, Download } from "lucide-react"
+import { X, Download, Maximize2, Minimize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 interface FilePreviewModalProps {
     isOpen: boolean
@@ -13,6 +14,8 @@ interface FilePreviewModalProps {
 }
 
 export function FilePreviewModal({ isOpen, onClose, fileUrl, title, fileType }: FilePreviewModalProps) {
+    const [isFullscreen, setIsFullscreen] = useState(false)
+
     const handleDownload = () => {
         const link = document.createElement("a")
         link.href = fileUrl
@@ -23,13 +26,42 @@ export function FilePreviewModal({ isOpen, onClose, fileUrl, title, fileType }: 
         document.body.removeChild(link)
     }
 
+    const toggleFullscreen = () => {
+        setIsFullscreen(!isFullscreen)
+    }
+
+    // For documents, use Google Docs Viewer
+    const getDocumentUrl = () => {
+        if (fileType === "DOC" || fileType === "DOCUMENT") {
+            // Use Google Docs Viewer for better compatibility
+            return `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`
+        }
+        return fileUrl
+    }
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] p-0 bg-white border-gray-200 overflow-hidden flex flex-col">
+            <DialogContent
+                className={`p-0 bg-white border-gray-200 overflow-hidden flex flex-col ${isFullscreen ? "sm:max-w-[98vw] sm:max-h-[98vh]" : "sm:max-w-[90vw] sm:max-h-[90vh]"
+                    }`}
+            >
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate pr-4">{title}</h3>
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 shrink-0">
+                    <h3 className="text-lg font-semibold text-gray-900 truncate pr-4 flex-1">{title}</h3>
                     <div className="flex items-center space-x-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={toggleFullscreen}
+                            className="flex items-center space-x-2"
+                            title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                        >
+                            {isFullscreen ? (
+                                <Minimize2 className="h-4 w-4" />
+                            ) : (
+                                <Maximize2 className="h-4 w-4" />
+                            )}
+                        </Button>
                         <Button
                             variant="outline"
                             size="sm"
@@ -37,11 +69,12 @@ export function FilePreviewModal({ isOpen, onClose, fileUrl, title, fileType }: 
                             className="flex items-center space-x-2"
                         >
                             <Download className="h-4 w-4" />
-                            <span>Download</span>
+                            <span className="hidden sm:inline">Download</span>
                         </Button>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+                            className="p-2 rounded-md hover:bg-gray-200 transition-colors"
+                            title="Close"
                         >
                             <X className="h-5 w-5 text-gray-600" />
                         </button>
@@ -54,23 +87,23 @@ export function FilePreviewModal({ isOpen, onClose, fileUrl, title, fileType }: 
                         <iframe
                             src={fileUrl}
                             title={title}
-                            className="w-full h-[80vh]"
+                            className={`w-full ${isFullscreen ? "h-[calc(98vh-4rem)]" : "h-[80vh]"}`}
                         />
                     ) : fileType === "IMAGE" ? (
-                        <div className="flex items-center justify-center p-4 min-h-[80vh]">
+                        <div className={`flex items-center justify-center p-4 ${isFullscreen ? "min-h-[calc(98vh-4rem)]" : "min-h-[80vh]"}`}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={fileUrl}
                                 alt={title}
-                                className="max-w-full max-h-[80vh] object-contain"
+                                className={`max-w-full object-contain ${isFullscreen ? "max-h-[calc(98vh-4rem)]" : "max-h-[80vh]"}`}
                             />
                         </div>
                     ) : (
-                        // For DOC/DOCUMENT types, try to use Google Docs Viewer
+                        // For DOC/DOCUMENT types, use Google Docs Viewer
                         <iframe
-                            src={`https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                            src={getDocumentUrl()}
                             title={title}
-                            className="w-full h-[80vh]"
+                            className={`w-full ${isFullscreen ? "h-[calc(98vh-4rem)]" : "h-[80vh]"}`}
                         />
                     )}
                 </div>
