@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Mail, Phone, Calendar, BookOpen, Save, Loader2 } from "lucide-react"
+import { User, Mail, Phone, Calendar, BookOpen, Save, Loader2, Lock, ShieldAlert } from "lucide-react"
 import { useSession } from "next-auth/react"
 
 interface UserProfile {
@@ -28,7 +28,11 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
+    const [showPasswordField, setShowPasswordField] = useState(false)
     const [formData, setFormData] = useState({
+        username: "",
+        newPassword: "",
+        currentPassword: "",
         phone: "",
         year: "",
         department: "",
@@ -46,6 +50,9 @@ export default function ProfilePage() {
             const data = await res.json()
             setProfile(data)
             setFormData({
+                username: data.username || "",
+                newPassword: "",
+                currentPassword: "",
                 phone: data.phone || "",
                 year: data.year || "",
                 department: data.department || "",
@@ -78,7 +85,15 @@ export default function ProfilePage() {
             const updatedUser = await res.json()
             setProfile({ ...profile!, ...updatedUser })
 
-            // Update session to reflect changes if necessary (though session usually has minimal data)
+            // Clear password fields and hide the password confirmation section
+            setFormData(prev => ({
+                ...prev,
+                newPassword: "",
+                currentPassword: ""
+            }))
+            setShowPasswordField(false)
+
+            // Update session to reflect changes if necessary
             await updateSession()
 
             alert("Profile updated successfully!")
@@ -137,6 +152,67 @@ export default function ProfilePage() {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-4 border-b pb-4">
+                                <h3 className="text-sm font-medium text-gray-500">Account Settings</h3>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Username</label>
+                                        <div className="relative">
+                                            <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                            <Input
+                                                className="pl-9"
+                                                value={formData.username}
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, username: e.target.value })
+                                                    setShowPasswordField(true)
+                                                }}
+                                                placeholder="Username"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">New Password</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                            <Input
+                                                type="password"
+                                                className="pl-9"
+                                                value={formData.newPassword}
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, newPassword: e.target.value })
+                                                    setShowPasswordField(true)
+                                                }}
+                                                placeholder="Leave blank to keep current"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {showPasswordField && (
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 animate-in fade-in slide-in-from-top-2">
+                                        <div className="flex items-start space-x-3">
+                                            <ShieldAlert className="h-5 w-5 text-yellow-600 mt-0.5" />
+                                            <div className="space-y-2 w-full">
+                                                <label className="text-sm font-medium text-yellow-900">
+                                                    Current Password Required
+                                                </label>
+                                                <p className="text-xs text-yellow-700">
+                                                    To save changes to your username or password, please enter your current password.
+                                                </p>
+                                                <Input
+                                                    type="password"
+                                                    value={formData.currentPassword}
+                                                    onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                                                    placeholder="Enter current password"
+                                                    className="bg-white"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Phone Number</label>
