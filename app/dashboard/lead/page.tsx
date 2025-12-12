@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
+import { ActiveMembersCard } from "@/components/ActiveMembersCard"
 
 export default async function LeadDashboard() {
     const session = await getServerSession(authOptions)
@@ -45,12 +46,29 @@ export default async function LeadDashboard() {
     const whereDomainRelation = domainId ? { domainId } : {}
 
     // 1. Active Members
-    const activeMembers = await db.user.count({
+    const activeMembers = await db.user.findMany({
         where: {
             ...whereDomain,
             role: "MEMBER"
+        },
+        select: {
+            id: true,
+            username: true,
+            email: true,
+            department: true,
+            year: true,
+            createdAt: true
+        },
+        orderBy: {
+            createdAt: 'desc'
         }
     })
+
+    // Get domain name if domainId exists
+    const domain = domainId ? await db.domain.findUnique({
+        where: { id: domainId },
+        select: { name: true }
+    }) : null
 
     // 2. Pending Submissions
     const pendingSubmissions = await db.submission.count({
@@ -116,16 +134,11 @@ export default async function LeadDashboard() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-secondary-500">Active Members</CardTitle>
-                        <Users className="h-4 w-4 text-primary-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold text-neutral-graphite">{activeMembers}</div>
-                        <p className="text-xs text-secondary-400 mt-1">In your domain</p>
-                    </CardContent>
-                </Card>
+                <ActiveMembersCard
+                    count={activeMembers.length}
+                    members={activeMembers}
+                    domainName={domain?.name}
+                />
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-secondary-500">Pending Submissions</CardTitle>
@@ -183,8 +196,8 @@ export default async function LeadDashboard() {
                                         </div>
                                         <div className="flex items-center space-x-3">
                                             <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${sub.status === 'CHECKED' ? 'bg-success/10 text-success' :
-                                                    sub.status === 'REJECTED' ? 'bg-error/10 text-error' :
-                                                        'bg-warning/10 text-warning'
+                                                sub.status === 'REJECTED' ? 'bg-error/10 text-error' :
+                                                    'bg-warning/10 text-warning'
                                                 }`}>
                                                 {sub.status}
                                             </span>

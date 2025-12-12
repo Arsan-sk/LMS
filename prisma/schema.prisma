@@ -106,13 +106,13 @@ model Resource {
   description String?
   type        ResourceType
   url         String
-  uploadedBy  String
+  uploadedBy  String?
   tags        Json?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   domain      Domain       @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  uploader    User         @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  uploader    User?        @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
 }
 
 model Assignment {
@@ -125,12 +125,12 @@ model Assignment {
   submissionType    SubmissionType
   dueDate           DateTime?
   published         Boolean        @default(false)
-  createdBy         String
+  createdBy         String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
   domain            Domain         @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  creator           User           @relation("CreatedAssignments", fields: [createdBy], references: [id], onDelete: Cascade)
+  creator           User?          @relation("CreatedAssignments", fields: [createdBy], references: [id], onDelete: SetNull)
   submissions       Submission[]
 }
 
@@ -141,12 +141,12 @@ model Quiz {
   description String?
   totalPoints Int      @default(0)
   published   Boolean  @default(false)
-  createdBy   String
+  createdBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   domain      Domain     @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  creator     User       @relation("CreatedQuizzes", fields: [createdBy], references: [id], onDelete: Cascade)
+  creator     User?      @relation("CreatedQuizzes", fields: [createdBy], references: [id], onDelete: SetNull)
   questions   Question[]
   submissions Submission[]
 }
