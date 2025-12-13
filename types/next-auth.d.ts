@@ -8,6 +8,7 @@ declare module "next-auth" {
             username: string
             role: Role
             domainId: string | null
+            profilePhoto: string | null
         } & DefaultSession["user"]
     }
 
@@ -16,6 +17,7 @@ declare module "next-auth" {
         username: string
         role: Role
         domainId: string | null
+        profilePhoto: string | null
     }
 }
 
@@ -25,5 +27,6 @@ declare module "next-auth/jwt" {
         username: string
         role: Role
         domainId: string | null
+        profilePhoto: string | null
     }
 }

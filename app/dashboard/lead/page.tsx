@@ -112,7 +112,7 @@ export default async function LeadDashboard() {
 
     return (
         <div className="space-y-8 animate-fade-in">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-neutral-graphite">Lead Dashboard</h1>
                     <p className="text-secondary-500 mt-1">Manage your domain and track progress.</p>
@@ -133,7 +133,7 @@ export default async function LeadDashboard() {
                 </div>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <ActiveMembersCard
                     count={activeMembers.length}
                     members={activeMembers}
@@ -171,7 +171,7 @@ export default async function LeadDashboard() {
                 </Card>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
                     <CardHeader>
                         <CardTitle>Recent Submissions</CardTitle>

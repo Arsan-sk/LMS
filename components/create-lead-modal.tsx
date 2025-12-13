@@ -73,7 +73,7 @@ export function CreateLeadModal({ domains }: { domains: { id: string, name: stri
                     Create User
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>
                     <DialogDescription>

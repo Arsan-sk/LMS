@@ -38,8 +38,12 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                             {session?.user?.role}
                         </span>
                     </div>
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold border-2 border-white shadow-sm group-hover:shadow-md transition-all">
-                        {session?.user?.username?.[0]?.toUpperCase()}
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold border-2 border-white shadow-sm group-hover:shadow-md transition-all overflow-hidden">
+                        {session?.user?.profilePhoto ? (
+                            <img src={session.user.profilePhoto} alt={session.user.username} className="h-full w-full object-cover" />
+                        ) : (
+                            session?.user?.username?.[0]?.toUpperCase()
+                        )}
                     </div>
                 </Link>
             </div>

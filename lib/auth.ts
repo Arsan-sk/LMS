@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     role: user.role,
                     domainId: domainId,
+                    profilePhoto: user.profilePhoto,
                 }
             }
         })
@@ -70,16 +71,23 @@ export const authOptions: NextAuthOptions = {
                 session.user.username = token.username
                 session.user.role = token.role
                 session.user.domainId = token.domainId
+                session.user.profilePhoto = token.profilePhoto
             }
             return session
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.id = user.id
                 token.username = user.username
                 token.role = user.role
                 token.domainId = user.domainId
+                token.profilePhoto = user.profilePhoto
             }
+
+            if (trigger === "update" && session?.user) {
+                token.profilePhoto = session.user.profilePhoto
+            }
+
             return token
         }
     }
