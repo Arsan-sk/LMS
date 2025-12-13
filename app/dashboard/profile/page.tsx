@@ -352,7 +352,7 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="pt-2 flex justify-end">
-                                    <Button type="submit" variant="destructive" disabled={isSavingSecurity}>
+                                    <Button type="submit" variant="danger" disabled={isSavingSecurity}>
                                         {isSavingSecurity ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
